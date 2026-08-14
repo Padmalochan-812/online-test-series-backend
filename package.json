@@ -1,0 +1,26 @@
+{
+  "name": "test-series",
+  "version": "1.0.0",
+  "description": "it is a test series backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Padmalochan-812/online-test-series-backend.git"
+  },
+  "author": "Padmalochan Sahoo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Padmalochan-812/online-test-series-backend/issues"
+  },
+  "homepage": "https://github.com/Padmalochan-812/online-test-series-backend#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}
