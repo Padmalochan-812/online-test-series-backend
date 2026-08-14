@@ -2,9 +2,10 @@
   "name": "test-series",
   "version": "1.0.0",
   "description": "it is a test series backend",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec node -r dotenv/config ./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,9 +19,11 @@
   "homepage": "https://github.com/Padmalochan-812/online-test-series-backend#readme",
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.9.2"
   },
   "devDependencies": {
+    "nodemon": "^3.1.14",
     "prettier": "3.9.6"
   }
 }
