@@ -24,7 +24,7 @@ const generateAccessAndRefreshToken = async(userId) => {
 }
 
 const registerUser = asyncHandler( async (req, res) => {
-    const {username, fulName, email, password, phone_number} = req.body;
+    const {username, fulName, email, password, phone_number, role} = req.body;
     if(
         [fulName, email, username, password, phone_number].some((field) =>
         field?.trim() === "")
@@ -42,11 +42,8 @@ const registerUser = asyncHandler( async (req, res) => {
 
     const avatarLocalPath = req.field?.avatar?.[0]?.path;
 
-    if (!avatarLocalPath){
-        avatarLocalPath = "";
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    
+    const avatar = await uploadOnCloudinary(avatarLocalPath || "");
 
     const user = await User.create({
         username: username.toLowerCase(),
@@ -54,8 +51,7 @@ const registerUser = asyncHandler( async (req, res) => {
         phone_number,
         fulName,
         avatar: avatar?.url || "",
-        password,
-        role
+        password
     })
 
     const createdUser = await User.findById (user._id).select(
@@ -89,7 +85,6 @@ const loginUser = asyncHandler( async (req, res) => {
     if(!isPasswordValid){
         throw new apiError(404, "Invalid user credential")
     }
-
     const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
