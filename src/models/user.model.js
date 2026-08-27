@@ -38,6 +38,10 @@ const userSchema = new Schema (
         },
         refreshToken: {
             type: String
+        },
+        role: {
+            type: String,
+            default : "student"
         }
     },
     {
