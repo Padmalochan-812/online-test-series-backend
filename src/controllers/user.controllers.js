@@ -206,7 +206,9 @@ const ChangeCurrentPassword = asyncHandler( async (req, res) => {
 
 const userProfile = asyncHandler( async (req, res) => {
     const user = req.user
-    return res.status(200).json(200, user, "Current user fetched Successfully")
+    return res
+    .status(200)
+    .json(new apiResponse(200, user, "Current user fetched Successfully"))
 })
 
 const updateUserDetails = asyncHandler(async (req, res) => {
@@ -259,7 +261,7 @@ const updateAvatar = asyncHandler (async (req, res) => {
     ).select("-password -refreshToken")
 
     return res.status(200)
-    .json(200, user, "Avatar Image updated successfully")
+    .json(new apiResponse(200, user, "Avatar Image updated successfully"))
 })
 
 
