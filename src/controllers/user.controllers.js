@@ -40,8 +40,8 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new apiError(409, "User with email or number")
     }
 
-    const avatarLocalPath = req.field?.avatar?.[0]?.path;
-
+    const avatarLocalPath = req.file?.path;
+    
     
     const avatar = await uploadOnCloudinary(avatarLocalPath || "");
 
