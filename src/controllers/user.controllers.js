@@ -2,10 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {User} from "../models/user.model.js"
 import {apiError} from "../utils/apiError.js"
 import {apiResponse} from "../utils/apiResponse.js"
-import {upload} from "../middlewares/multer.middlewares.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
-import { appendFileSync } from "fs";
 
 const generateAccessAndRefreshToken = async(userId) => {
     try {
