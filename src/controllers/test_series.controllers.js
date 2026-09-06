@@ -36,3 +36,46 @@ const CreateTestSeries = asyncHandler (async (req, res) =>{
     .json(200, test_series ,"test series create successfully")
 
 })
+
+const UpdateTestSeries = asyncHandler( async (req, res) => {
+    const { name, description, price, discountPrice } = req.body
+
+    if(
+        [ name, description, price, discountPrice ].some((field) => field?.trim() === "" )
+    ) {
+        throw new apiError (400, "All fields are required !")
+    }
+
+    const test_series = await Test_Series.findByIdAndUpdate(
+        req.test_series.id,
+        {
+            $set:{
+                name,
+                description,
+                price,
+                discountPrice,
+                percentage: percentage
+            }
+        },
+        {
+            returnDocument: "after"
+        }
+        
+
+    )
+
+    if(!test_series){
+        throw new apiError( 401, "test series not update")
+    }
+    
+    return res.status(200).json(
+        new apiResponse(200, test_series, "test series Details update successful")
+    )
+    
+
+})
+
+export {
+    CreateTestSeries,
+    UpdateTestSeries
+}
