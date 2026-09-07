@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Test_Series } from "../models/test_series.model.js";
 
 const CreateTestSeries = asyncHandler (async (req, res) =>{
     const {name, description, price, discountPrice } = req.body
@@ -75,7 +76,67 @@ const UpdateTestSeries = asyncHandler( async (req, res) => {
 
 })
 
+const UpdateBanner = asyncHandler(async (req, res) => {
+    const bannerLocalPath = req.file?.path
+    if(!bannerLocalPath) {
+        throw new apiError(401, "Banner local path is required !")
+    }
+
+    const banner = await uploadOnCloudinary(bannerLocalPath)
+    if(!banner) {
+        throw new apiError(401, "error while uploading banner !")
+    }
+
+    const test_series = await Test_Series.findByIdAndUpdate(
+        req.test_series?._id,
+        {
+            $set:{
+                banner: banner.url
+            }
+        },
+        {
+            returnDocument: "after"
+        }
+    )
+
+    return res.status(200).json(
+        new apiResponse( 200, test_series, "Banner Image updated successfully ")
+    )
+})
+
+const GetAllTestSeries = asyncHandler ( async (req, res) => {
+    const test_series = await Test_Series.find({})
+    if( test_series.length ==0 ){
+        throw new apiError (401, "No test series")
+    }
+    
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            test_series,
+            "All test series fetched successfully "
+        )
+    )
+})
+
+const GetTestSeriesById = asyncHandler( async( res, res) => {
+    const test_seriesId = req.params._id
+
+    const test_series = await Test_Series.findById(test_seriesId)
+
+    if(!test_series) {
+        throw new apiError (401, " test series not found !")
+    }
+
+    return res.status(200).json(
+        new apiResponse(200, test_series, "Test Series fetched successfully")
+    )
+})
+
 export {
     CreateTestSeries,
-    UpdateTestSeries
+    UpdateTestSeries,
+    UpdateBanner,
+    GetAllTestSeries,
+    GetTestSeriesById
 }
