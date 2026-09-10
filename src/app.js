@@ -15,8 +15,10 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 import userRouter from "./routes/user.route.js"
+import testRoute from "./routes/testseries.route.js"
 
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/test-series", testRoute)
 
 app.use((err, req, res, next) => {
     console.error(`${req.method} ${req.originalUrl} failed:`, err.message)

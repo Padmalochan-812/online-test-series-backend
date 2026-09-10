@@ -14,6 +14,8 @@ const router = Router();
 
 router.route("/create-test-series").post(verifyJWT,CreateTestSeries);
 router.route("/update-test-series").patch(verifyJWT, UpdateTestSeries);
-router.router("/update-banner").patch(verifyJWT, upload.single("banner"), updated banner);
-router.route ("/get-allTest-series ").post(verifyJWT, GetAllTestSeries;)
+router.route("/update-banner").patch(verifyJWT, upload.single("banner"), UpdateBanner);
+router.route ("/get-all-test-series").post(verifyJWT, GetAllTestSeries)
+router.route("/get-test-series-by-id").get(verifyJWT, GetTestSeriesById)
 
+export default router;

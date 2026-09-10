@@ -119,7 +119,7 @@ const GetAllTestSeries = asyncHandler ( async (req, res) => {
     )
 })
 
-const GetTestSeriesById = asyncHandler( async( res, res) => {
+const GetTestSeriesById = asyncHandler( async( req, res) => {
     const test_seriesId = req.params._id
 
     const test_series = await Test_Series.findById(test_seriesId)
