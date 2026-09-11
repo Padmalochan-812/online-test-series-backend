@@ -6,7 +6,7 @@ const test_seriesSchema = new Schema(
             type: String,
             required: true
         },
-        name: {
+        title: {
             type: String,
             required: true,
             index: true
@@ -23,6 +23,9 @@ const test_seriesSchema = new Schema(
             type: Number
         },
         discountPercentage: {
+            type: Number
+        },
+        percentage: {
             type: Number
         }
     },

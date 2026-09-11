@@ -4,11 +4,11 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Test_Series } from "../models/test_series.model.js";
 
-const CreateTestSeries = asyncHandler (async (req, res) =>{
-    const {name, description, price, discountPrice } = req.body
+const CreateTestSeries = asyncHandler (async (req, res) => {
+    const {title, description, price, discountPrice } = req.body;
 
     if(
-        [ name, description, price, discountPrice ].some((field) => field?.trim() === "" )
+        [ title, description, price, discountPrice ].some((field) => field?.trim() === "" )
     ) {
         throw new apiError (400, "All fields are required !")
     }
@@ -18,9 +18,9 @@ const CreateTestSeries = asyncHandler (async (req, res) =>{
     const banner = await uploadOnCloudinary(bannerLocalPath || "");
 
     const percentage = (((price-discountPrice)/price)*100)
-
+    
     const test_series = await Test_Series.create({
-        name,
+        title,
         description,
         price,
         discountPrice,
@@ -33,25 +33,30 @@ const CreateTestSeries = asyncHandler (async (req, res) =>{
         throw new apiError(500, "Something Went Wrong while create test series  ")
     }
 
-    return res.status(200)
-    .json(200, test_series ,"test series create successfully")
+    return res
+    .status(200)
+    .json(new apiResponse (200, test_series ,"test series create successfully"))
 
 })
 
 const UpdateTestSeries = asyncHandler( async (req, res) => {
-    const { name, description, price, discountPrice } = req.body
+    const { title, description, price, discountPrice } = req.body
 
-    if(
-        [ name, description, price, discountPrice ].some((field) => field?.trim() === "" )
-    ) {
-        throw new apiError (400, "All fields are required !")
+    if ( !title?.trim() || !description?.trim() || price === undefined || discountPrice === undefined) {
+        throw new apiError(400, "All fields are required!");
     }
+    
+    
+    const percentage = (((price-discountPrice)/price)*100)
+    
+    
 
     const test_series = await Test_Series.findByIdAndUpdate(
-        req.test_series.id,
+        req.test_series._id,
+        
         {
             $set:{
-                name,
+                title,
                 description,
                 price,
                 discountPrice,
