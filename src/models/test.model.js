@@ -3,27 +3,27 @@ import mongoose, {Schema} from "mongoose";
 const testSchema = new Schema(
     {
         title: {
-            types: String,
+            type: String,
             required: true
         },
         duration: {
-            types: Number,
+            type: Number,
             required: true
         },
         totalMarks: {
-            types: Number,
+            type: Number,
             required: true
         },
         totalTime: {
-            types: Number,
+            type: Number,
             required: true
         },
         startTime: {
-            types: Date,
+            type: Date,
             required: true
         },
         endTime: {
-            types: Date,
+            type: Date,
             required: true
         },
         testSeries:{

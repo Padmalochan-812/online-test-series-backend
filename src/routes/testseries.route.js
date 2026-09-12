@@ -4,7 +4,8 @@ import {
     UpdateTestSeries,
     UpdateBanner,
     GetAllTestSeries,
-    GetTestSeriesById
+    GetTestSeriesById,
+    deleteTestSeries
 } from "../controllers/test_series.controllers.js"
 
 import {upload} from "../middlewares/multer.middlewares.js"
@@ -17,5 +18,6 @@ router.route("/update-test-series/:id").patch(verifyJWT, UpdateTestSeries);
 router.route("/update-banner/:id").patch(verifyJWT, upload.single("banner"), UpdateBanner);
 router.route ("/get-all-test-series").get(verifyJWT, GetAllTestSeries)
 router.route("/get-test-series-by-id/:id").get(verifyJWT, GetTestSeriesById)
+router.route("/delete-test-series/:id").post(verifyJWT, deleteTestSeries);
 
 export default router;

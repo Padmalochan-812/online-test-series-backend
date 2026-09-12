@@ -26,6 +26,7 @@ const CreateTestSeries = asyncHandler (async (req, res) => {
         discountPrice,
         banner: banner?.url || "",
         percentage: percentage
+        
     
     })
 
@@ -131,7 +132,7 @@ const GetAllTestSeries = asyncHandler ( async (req, res) => {
 
 const GetTestSeriesById = asyncHandler( async( req, res) => {
     const {id} = req.params
-    console.log(id)
+    
 
     const test_series = await Test_Series.findById(id)
 
@@ -143,11 +144,26 @@ const GetTestSeriesById = asyncHandler( async( req, res) => {
         new apiResponse(200, test_series, "Test Series fetched successfully")
     )
 })
+const deleteTestSeries = asyncHandler( async(req, res) => {
+    const {id} = req.params
+    const test_series = await Test_Series.findById(id)
+
+    if(!test_series) {
+        throw new apiError (401, " test series not found !")
+    }
+
+    await Test_Series.findByIdAndDelete(id)
+    
+    return res
+    .status(200)
+    .json(new apiResponse(200, "", "test series deleted successfully"))
+})
 
 export {
     CreateTestSeries,
     UpdateTestSeries,
     UpdateBanner,
     GetAllTestSeries,
-    GetTestSeriesById
+    GetTestSeriesById,
+    deleteTestSeries
 }
