@@ -49,10 +49,10 @@ const UpdateTestSeries = asyncHandler( async (req, res) => {
     
     const percentage = (((price-discountPrice)/price)*100)
     
+    const {id} = req.params
     
-
     const test_series = await Test_Series.findByIdAndUpdate(
-        req.test_series._id,
+        id,
         
         {
             $set:{
@@ -82,7 +82,11 @@ const UpdateTestSeries = asyncHandler( async (req, res) => {
 })
 
 const UpdateBanner = asyncHandler(async (req, res) => {
-    const bannerLocalPath = req.file?.path
+
+    
+    const bannerLocalPath = req.file?.path;
+
+
     if(!bannerLocalPath) {
         throw new apiError(401, "Banner local path is required !")
     }
@@ -91,9 +95,10 @@ const UpdateBanner = asyncHandler(async (req, res) => {
     if(!banner) {
         throw new apiError(401, "error while uploading banner !")
     }
-
+    const {id} = req.params
+    console.log(id)
     const test_series = await Test_Series.findByIdAndUpdate(
-        req.test_series?._id,
+        id,
         {
             $set:{
                 banner: banner.url
@@ -125,9 +130,10 @@ const GetAllTestSeries = asyncHandler ( async (req, res) => {
 })
 
 const GetTestSeriesById = asyncHandler( async( req, res) => {
-    const test_seriesId = req.params._id
+    const {id} = req.params
+    console.log(id)
 
-    const test_series = await Test_Series.findById(test_seriesId)
+    const test_series = await Test_Series.findById(id)
 
     if(!test_series) {
         throw new apiError (401, " test series not found !")
