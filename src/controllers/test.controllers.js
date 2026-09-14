@@ -106,10 +106,39 @@ const getAllTest = asyncHandler(async (req, res) => {
     );
 });
 
+const getTestById = asyncHandler(async(req, res) => {
+    const {testId} = req.params;
+    const test = await Test.findById(testId);
+    if (!test){
+        throw new apiError(401, " The test dose not exist.")
+    }
+
+    return res
+    .status(200)
+    .json( new apiResponse(200, test, "test fetched successfully") )
+})
+
+const deleteTest = asyncHandler(async(req, res) => {
+    const {testId} = req.params
+    const test = await Test.findById(testId)
+
+    if(!test) {
+        throw new apiError (401, " test series not found !")
+    }
+
+    await Test.findByIdAndDelete(testId)
+    
+    return res
+    .status(200)
+    .json(new apiResponse(200, "", "test deleted successfully"))
+})
+
 
 
 export {
     createTest,
     updateTest,
-    getAllTest
+    getAllTest,
+    getTestById,
+    deleteTest
 }
