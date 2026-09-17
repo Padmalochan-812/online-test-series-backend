@@ -17,10 +17,12 @@ app.use(cookieParser())
 import userRouter from "./routes/user.route.js"
 import testSeriesRoute from "./routes/testseries.route.js"
 import testRoute from "./routes/test.route.js"
+import subjectRoute from "./routes/subject.route.js"
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/test-series", testSeriesRoute)
 app.use("/api/v1/test", testRoute)
+app.use("/api/v1/subject", subjectRoute)
 
 
 app.use((err, req, res, next) => {

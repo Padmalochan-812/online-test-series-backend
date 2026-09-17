@@ -3,7 +3,7 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { Test } from "../models/test.model.js"
 import { Test_Series } from "../models/test_series.model.js";
-import {Subject, subject} from "../models/subject.model.js"
+import {Subject} from "../models/subject.model.js"
 
 const addSubject  = asyncHandler(async(req, res) => {
     const {testId} = req.params;
@@ -34,33 +34,86 @@ const addSubject  = asyncHandler(async(req, res) => {
 
 const updateSubject= asyncHandler(async(req, res) => {
     const {name}= req.body;
-    const {testId} = req.params;
+    const {subjectId} = req.params;
 
-    const test = await findById({
-        testId,
+    const subject = await findById(
+        subjectId,
         {
             $set:{
-                title,
-                duration,
-                totalMarks,
-                totalTime,
-                startTime,
-                endTime
+                name
             }
         },
         {
             returnDocument: "after"
         }
-    )
+    );
 
-    if(!updatedTest){
-        throw new apiError(401, "test not update ")
+    if(!subject){
+        throw new apiError(401, "subject not update ")
     }
 
     return res.status(200).json(
-        new apiResponse(200, updatedTest, "test series Details update successful")
+        new apiResponse(200, updateSubject, "subject Details update successful")
     )
 })
 
+const getAllSubject = asyncHandler( async(req, res) => {
+    const {testId} = req.params
+
+    const subject = await Subject.find({
+        test : testId
     })
+
+    if(subject.length === 0){
+        throw new apiError(404, "there was no subjects" )
+    }
+    
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            subject,
+            "All subjects fetched successfully"
+        )
+    );
 })
+
+const getSubjectById = asyncHandler(async(req, res) => {
+    const {subId} = req.params ;
+
+    const subject = await Subject.findById(subId)
+    if(!subject){
+        throw new apiError(404,"Subject not exist")
+    }
+
+    return res.status(200).json(
+        new apiResponse(
+            200,
+            subject,
+            "all subjects fetched successfully"
+        )
+    );
+
+})
+
+
+const deleteSubject = asyncHandler(async (req, res) => {
+    const {subjectId} = req.params;
+    const subject = await Subject.findById(subjectId)
+    if(!subject){
+        throw new apiError(401, "Subject not found..")
+    }
+
+    await Subject.findByIdAndDelete(subjectId);
+
+    return res
+    .status(200)
+    .json(new apiResponse(200, "", "test deleted successfully"))
+})
+
+export {
+    addSubject,
+    updateSubject,
+    getAllSubject,
+    getSubjectById,
+    deleteSubject
+}
