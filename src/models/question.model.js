@@ -15,6 +15,11 @@ const questionSchema = new Schema(
             required: true,
             default: 1
         },
+        negative:{
+            type: Number,
+            required: true,
+            default: 0.25
+        },
         test:{
             type: Schema.Types.ObjectId,
             ref: "Test"

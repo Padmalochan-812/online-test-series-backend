@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { Test } from "../models/test.model.js"
-import { Test_Series } from "../models/test_series.model.js";
 import {Subject} from "../models/subject.model.js"
 
 const addSubject  = asyncHandler(async(req, res) => {
