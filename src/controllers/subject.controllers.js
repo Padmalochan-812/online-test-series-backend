@@ -34,8 +34,7 @@ const addSubject  = asyncHandler(async(req, res) => {
 const updateSubject= asyncHandler(async(req, res) => {
     const {name}= req.body;
     const {subjectId} = req.params;
-
-    const subject = await findById(
+    const subject = await Subject.findByIdAndUpdate(
         subjectId,
         {
             $set:{
@@ -52,7 +51,7 @@ const updateSubject= asyncHandler(async(req, res) => {
     }
 
     return res.status(200).json(
-        new apiResponse(200, updateSubject, "subject Details update successful")
+        new apiResponse(200, subject, "subject Details update successful")
     )
 })
 

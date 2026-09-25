@@ -4,70 +4,84 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { Question } from "../models/question.model.js";
 import {Test} from "../models/test.model.js"
 import {Subject} from "../models/subject.model.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 const createQuestion = asyncHandler(async (req, res) => {
 
-    const {subjectId} = req.params;
+    const { subjectId } = req.params;
+
     const subject = await Subject.findById(subjectId);
+
     if (!subject) {
-        throw new apiError(
-            400,
-            "Subject is required"
-        );
+        throw new apiError(400, "Subject is required");
     }
 
-
-    
     const {
         questionText,
         options,
         marks,
-        negativeMarks,
+        negativeMarks
     } = req.body;
 
-    const questionLocalPath = req.file?.path;
-    const image = await uploadOnCloudinary(questionLocalPath || "") 
-    
-    if (!questionText || !options || !marks || !negativeMarks) {
-        throw new apiError(
-            400,
-            "all fields are required"
-        );
+    // Required fields
+    if (
+        !questionText ||
+        marks === undefined ||
+        negativeMarks === undefined ||
+        !options
+    ) {
+        throw new apiError(400, "All fields are required");
     }
 
-    if (!options || !Array.isArray(options)) {
-        throw new apiError(
-            400,
-            "Options are required"
-        );
+    // Convert options string to array
+    let parsedOptions;
+
+    try {
+        parsedOptions = JSON.parse(options);
+    } catch (error) {
+        throw new apiError(400, "Invalid options JSON");
     }
 
-    if (options.length < 2) {
+    // Validate options
+    if (!Array.isArray(parsedOptions)) {
+        throw new apiError(400, "Options are required");
+    }
+
+    if (parsedOptions.length < 2) {
         throw new apiError(
             400,
             "At least 2 options are required"
         );
     }
 
-    const correctOptions = options.filter(
+    // Check correct answer
+    const correctOptions = parsedOptions.filter(
         (option) => option.isCorrect === true
     );
 
-    if (correctOptions.length <= 0 ) {
+    if (correctOptions.length === 0) {
         throw new apiError(
             400,
-            "one or more correct answer is required"
+            "One or more correct answers are required"
         );
     }
 
+    // Upload image if provided
+    const questionLocalPath = req.file?.path;
+
+    const image = questionLocalPath
+        ? await uploadOnCloudinary(questionLocalPath)
+        : null;
+
+    // Create question
     const question = await Question.create({
         subject: subjectId,
-        questionText: questionText || "",
-        questionImage: image,
-        options,
-        marks: marks || 1,
-        negativeMarks: negativeMarks || 0,
+        questionText,
+        questionImage: image?.url || "",
+        options: parsedOptions,
+        marks,
+        negativeMarks
     });
 
     return res.status(201).json(
@@ -154,10 +168,10 @@ const updateQuestion = asyncHandler(async (req, res) => {
             (option) => option.isCorrect === true
         );
 
-        if (correctOptions.length !== 1) {
+        if (correctOptions.length <1 ) {
             throw new apiError(
                 400,
-                "Exactly one correct answer is required"
+                "at least one correct answer is required"
             );
         }
     }
@@ -239,6 +253,7 @@ const deleteQuestion = asyncHandler(async (req, res) => {
         )
     );
 });
+
 
 
 
