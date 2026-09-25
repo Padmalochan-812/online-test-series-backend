@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { Question } from "../models/question.model.js";
-import {Test} from "../models/test.model.js"
 import {Subject} from "../models/subject.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
@@ -127,17 +126,41 @@ const getQuestionsBySubject = asyncHandler(
     }
 );
 
+const getQuestionsById = asyncHandler(
+    async (req, res) => {
+
+        const { questionId } = req.params;
+
+        if (!questionId) {
+            throw new apiError(
+                400,
+                "Question ID is required"
+            );
+        }
+
+        const question = await Question.findById({
+            questionId
+        }).select("-options.isCorrect");
+
+        if (question.length === 0) {
+            throw new apiError(
+                404,
+                "No questions found "
+            );
+        }
+
+        return res.status(200).json(
+            new apiResponse(
+                200,
+                question,
+                "Questions fetched successfully"
+            )
+        );
+    }
+);
 const updateQuestion = asyncHandler(async (req, res) => {
 
     const { questionId } = req.params;
-
-    const {
-        questionText,
-        questionImage,
-        options,
-        marks,
-        negativeMarks,
-    } = req.body;
 
     if (!questionId) {
         throw new apiError(400, "Question ID is required");
@@ -150,73 +173,119 @@ const updateQuestion = asyncHandler(async (req, res) => {
         throw new apiError(404, "Question not found");
     }
 
-    // If options are being updated, validate them
-    if (options !== undefined) {
+    const {
+        questionText,
+        options,
+        marks,
+        negativeMarks
+    } = req.body;
 
-        if (!Array.isArray(options)) {
+    // -----------------------------
+    // Parse options
+    // -----------------------------
+
+    let parsedOptions;
+
+    if (options !== undefined) {
+        try {
+            parsedOptions = JSON.parse(options);
+        } catch (error) {
+            throw new apiError(400, "Invalid options JSON");
+        }
+
+        if (!Array.isArray(parsedOptions)) {
             throw new apiError(400, "Options must be an array");
         }
 
-        if (options.length < 2) {
+        if (parsedOptions.length < 2) {
             throw new apiError(
                 400,
                 "At least 2 options are required"
             );
         }
 
-        const correctOptions = options.filter(
+        const correctOptions = parsedOptions.filter(
             (option) => option.isCorrect === true
         );
 
-        if (correctOptions.length <1 ) {
+        if (correctOptions.length < 1) {
             throw new apiError(
                 400,
-                "at least one correct answer is required"
+                "At least one correct answer is required"
             );
         }
     }
 
-    // Don't allow an empty question
-    if (
-        questionText !== undefined &&
-        !questionText.trim() &&
-        !questionImage &&
-        !existingQuestion.questionImage
-    ) {
+    // -----------------------------
+    // Question image
+    // -----------------------------
+
+    let questionImage = existingQuestion.questionImage;
+
+    if (req.file?.path) {
+
+        const image = await uploadOnCloudinary(req.file.path);
+
+        if (!image?.url) {
+            throw new apiError(
+                500,
+                "Failed to upload question image"
+            );
+        }
+
+        questionImage = image.url;
+    }
+
+    // -----------------------------
+    // Validate question text/image
+    // -----------------------------
+
+    const finalQuestionText =
+        questionText !== undefined
+            ? questionText.trim()
+            : existingQuestion.questionText;
+
+    if (!finalQuestionText && !questionImage) {
         throw new apiError(
             400,
             "Question text or question image is required"
         );
     }
 
+    // -----------------------------
+    // Update question
+    // -----------------------------
+
+    const updateData = {};
+
+    if (questionText !== undefined) {
+        updateData.questionText = questionText.trim();
+    }
+
+    if (parsedOptions !== undefined) {
+        updateData.options = parsedOptions;
+    }
+
+    if (marks !== undefined) {
+        updateData.marks = marks;
+    }
+
+    if (negativeMarks !== undefined) {
+        updateData.negativeMarks = negativeMarks;
+    }
+
+    if (req.file?.path) {
+        updateData.questionImage = questionImage;
+    }
+
     const updatedQuestion = await Question.findByIdAndUpdate(
         questionId,
         {
-            $set: {
-                ...(questionText !== undefined && {
-                    questionText: questionText.trim(),
-                }),
-
-                ...(questionImage !== undefined && {
-                    questionImage,
-                }),
-
-                ...(options !== undefined && {
-                    options,
-                }),
-
-                ...(marks !== undefined && {
-                    marks,
-                }),
-
-                ...(negativeMarks !== undefined && {
-                    negativeMarks,
-                }),
-            },
+            $set: updateData
         },
         {
             new: true,
-            runValidators: true,
+            runValidators: true
         }
     );
 
@@ -261,5 +330,6 @@ export {
     createQuestion,
     getQuestionsBySubject,
     updateQuestion,
-    deleteQuestion
+    deleteQuestion,
+    getQuestionsById
 };
